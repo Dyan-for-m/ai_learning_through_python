@@ -1,24 +1,35 @@
 ## 快速索引
-- [[#pathlib 路径的优雅处理]]
-- [[#float None = None的新理解]]
-- [[#raise]]
-- [[#调用系统命令subprocess.run()]]
-- [[#解析json json.loads() VS eval()]]
-- [[#临时文件：文件的句柄+ delete = False]]
-- [[#文档字符串 Docstring]]
-- [[#pydantic]]
-	- [[#pydantic基础教程]]
-- [[#dic.get(key) 字典的安全取值方式]]
-- [[#语法糖]]
-- [[#my_dict.itmes()]]
-- [[#self 实例自己]]
-- [[#__双下划线]]
-- [[#_ 单下划线]]
-- [[#hasattr & getattr的深度解析]]
-- [[#"""+.strip()]]
-- [[#global关键词]]
-- [[#main]]
-- [[#append VS extend]]
+- [pathlib 路径的优雅处理](#pathlib-路径的优雅处理)
+- [float | None = None的新理解](#float--none--none的新理解)
+- [raise](#raise)
+- [调用系统命令subprocess.run()](#调用系统命令subprocessrun)
+- [解析json json.loads() VS eval()](#解析json-jsonloads-vs-eval)
+- [临时文件：文件的句柄+ delete = False](#临时文件文件的句柄-delete--false)
+- [文档字符串 Docstring](#文档字符串-docstring)
+- [pydantic](#pydantic)
+	- [pydantic基础教程](#pydantic基础教程)
+- [dic.get(key): 字典的安全取值方式](#dicgetkey-字典的安全取值方式)
+- [语法糖](#语法糖)
+- [my_dict.itmes()](#my_dictitmes)
+- [self 实例自己](#self-实例自己)
+- [__双下划线](#__双下划线)
+- [_ 单下划线](#_-单下划线)
+- [hasattr & getattr的深度解析](#hasattr--getattr的深度解析)
+- ["""+.strip()](#strip)
+- [global关键词](#global关键词)
+- [main](#main)
+- [append VS extend](#append-vs-extend)
+- [async & await](#async--await)
+- [argparse](#argparse)
+- [assert](#assert)
+- [try  & except & finally](#try--except--finally)
+- [去重并且保留顺序](#去重并且保留顺序)
+- [dict(zip())](#dictzip)
+- [生成器（Generator）](#生成器generator)
+- [any()](#any)
+- [set()集合](#set集合)
+- [DataFrame行迭代器](#dataframe行迭代器)
+
 ## pathlib 路径的优雅处理
 
 - **将路径作为「对象」处理**，支持**链式调用**
@@ -240,3 +251,79 @@ delta.reasoning_content = api_data["choices"][0]["delta"]["reasoning_content"]
 ## append VS extend
 - append添加在后面
 - extend添加在前面
+## async & await
+异步处理```python
+```python
+async def f(): 
+	await 网络请求 # 等，但不卡住别人 
+	做别的
+#运作整个异步程序
+asyncio.run(main())
+	
+```
+但是不能直接被调用，而是必须使用 `asyncio.run()` 调用
+## argparse
+ 可以在运行代码的时候直接在命令行加参数
+ ```python
+ parser = argparse.ArgumentParser(description="Chat with formula tools") #创建一个参数解析器
+ parser.add_argument( 
+	 "--formula", 
+	 action="append", #可以传入多个参数
+	 default=["moonshot/web-search:latest"], 
+	 help="Formula URIs",
+ )
+ ```
+- type = 参数类型限制
+- required = True必须传入这个参数
+- choices = ["a", "b", "c"]只能在给定的列表里面选择
+- nargs = “？”可选参数，“\*”接受多个值，放进列表
+- dest = "new_name" 给参数起内部别名
+## assert
+ `assert 条件，错误信息`
+ 如果条件不成立，直接报错并停止程序
+## try  & except & finally
+```python
+try: 
+	运行可能出错的代码 
+except Exception:
+	如果try出错那就跳转到这里
+finally: 
+	无论是否出错，一定执行
+	
+# 不管程序正常结束、崩溃、报错，都一定关闭网络连接！
+try: 
+	聊天逻辑 
+finally: 
+	await client.close()
+```
+
+## 去重并且保留顺序
+1. `dict.fromkeys(normalized_formulas)`
+	- 字典的key不会重复，所以此时会被整理为`key: None`
+2. list(dict...)
+	- 把字典的键变回列表
+## dict(zip())
+把两列数据，一对一对拼成字典！
+拉链函数zip逐行配对
+
+## 生成器（Generator）
+表达式：`(表达式 for 变量 in 可迭代对象)`
+生成器 = 一边循环、一边计算、一边吐出值的 “惰性迭代器”
+写法上就是把列表推导式的 `[]` 换成 `()`，或者用 `yield`
+本质上等价于一个带 `yield` 的函数
+- **不会立刻生成全部结果**
+- 只返回一个 “生成器对象”，**内存极小**
+- 只有遍历它时，才一个个计算
+## any()
+惰性计算 + 节省内存 + 提前终止
+语法规则：
+- 接受一个**可迭代对象**（生成器就是）
+- 内部会自动遍历它
+- 只要拿到一个 `True`，就**立刻停止遍历**（短路）
+- 不继续往下算，节省性能
+## set()集合
+set = 无序、不重复的容器
+自动去重，可以取差集，做集合的减法
+## DataFrame行迭代器
+`for index, row in df.iterrows()`
+
